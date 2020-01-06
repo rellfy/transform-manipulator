@@ -8,6 +8,8 @@ namespace TransformManipulation {
     public class Rotation : ITransformManipulator {
 
         [SerializeField]
+        private float rotationSpeed = 100f;
+        [SerializeField]
         private float radiusFromOrigin = 2f;
         [SerializeField]
         private Color forwardAxisColor = Color.blue;
@@ -17,20 +19,27 @@ namespace TransformManipulation {
         private Color rightAxisColor = Color.red;
         [SerializeField]
         private Collider rotationPrefab;
-        private Transform transform;
+
         private RotationAxis upAxis;
         private RotationAxis rightAxis;
         private RotationAxis forwardAxis;
+        private Vector3 rotationInput;
+        private Transform transform;
         private Rotator up;
         private Rotator right;
         private Rotator forward;
 
+        protected float RadiusFromOrigin => this.transform.localScale.magnitude * this.radiusFromOrigin;
+        public float RotationSpeed {
+            get => this.rotationSpeed;
+            set => this.rotationSpeed = value;
+        }
         public Transform Transform => this.transform;
         protected Collider PrefabInstance => UnityEngine.Object.Instantiate(this.rotationPrefab, this.transform);
-        protected float RadiusFromOrigin => this.transform.localScale.magnitude * this.radiusFromOrigin;
 
         public void Start(Transform target) {
             this.transform = target;
+            this.rotationInput = Vector3.zero;
 
             this.upAxis = new RotationAxis(target, Vector3.right, Vector3.up);
             this.rightAxis = new RotationAxis(target, Vector3.forward, Vector3.right);
@@ -40,22 +49,37 @@ namespace TransformManipulation {
             this.right = new Rotator(PrefabInstance, PrefabInstance, this.rightAxis, this.rightAxisColor);
             this.forward = new Rotator(PrefabInstance, PrefabInstance, this.forwardAxis, this.forwardAxisColor);
 
-            //this.upCW.AddComponent<ClickDelegate>().MouseDown += (sender, args) => { Rotate(Vector3.up); };
-            //this.upCCW.AddComponent<ClickDelegate>().MouseDown += (sender, args) => { Rotate(-Vector3.up); };
-            //this.rightCW.AddComponent<ClickDelegate>().MouseDown += (sender, args) => { Rotate(Vector3.right); };
-            //this.rightCCW.AddComponent<ClickDelegate>().MouseDown += (sender, args) => { Rotate(-Vector3.right); };
-            //this.forwardCW.AddComponent<ClickDelegate>().MouseDown += (sender, args) => { Rotate(Vector3.forward); };
-            //this.forwardCCW.AddComponent<ClickDelegate>().MouseDown += (sender, args) => { Rotate(-Vector3.forward); };
+            Listen();
+        }
+
+        private void Listen() {
+            this.up.RotationRequestStarted += StartRotation;
+            this.right.RotationRequestStarted += StartRotation;
+            this.forward.RotationRequestStarted += StartRotation;
+
+            this.up.RotationRequestEnded += EndRotation;
+            this.right.RotationRequestEnded += EndRotation;
+            this.forward.RotationRequestEnded += EndRotation;
         }
 
         public void Update() {
             this.up.Update(RadiusFromOrigin);
             this.right.Update(RadiusFromOrigin);
             this.forward.Update(RadiusFromOrigin);
+
+            this.transform.Rotate(this.rotationInput.normalized * this.rotationSpeed * Time.deltaTime, Space.World);
         }
 
-        private void Rotate(Vector3 rotation) {
+        private void StartRotation(object sender, Rotator.RotationType rotationType) {
+            RotationAxis axis = (RotationAxis)sender;
+            Vector3 rotation = Vector3.Cross(axis.Forward, axis.Up) * (rotationType == Rotator.RotationType.Clockwise ? 1f : -1f);
+            this.rotationInput += rotation;
+        }
 
+        private void EndRotation(object sender, Rotator.RotationType rotationType) {
+            RotationAxis axis = (RotationAxis)sender;
+            Vector3 rotation = Vector3.Cross(axis.Forward, axis.Up) * (rotationType == Rotator.RotationType.Clockwise ? 1f : -1f);
+            this.rotationInput = Vector3.zero;
         }
     }
 }

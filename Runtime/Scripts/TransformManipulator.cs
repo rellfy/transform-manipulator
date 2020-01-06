@@ -12,11 +12,25 @@ namespace TransformManipulation {
         private Rotation rotation;
         [SerializeField]
         private Translation translation;
+        [SerializeField]
+        private Camera camera;
 
         /// <summary>
         /// Hide this MonoBehaviour's transform as it will not be used in any scenario.
         /// </summary>
         public new Transform transform => this.target;
+        public Camera Camera {
+            get => this.camera;
+            set {
+                this.camera = value;
+                this.translation.Camera = value;
+            }
+        }
+
+        private void Start() {
+            if (this.camera == null)
+                this.camera = Camera.main;
+        }
 
         private void Update() {
             if (this.target == null)
@@ -25,8 +39,10 @@ namespace TransformManipulation {
             if (this.rotation.Transform == null)
                 this.rotation.Start(this.target);
 
-            if (this.translation.Transform == null)
+            if (this.translation.Transform == null) {
                 this.translation.Start(this.target);
+                this.translation.Camera = this.camera;
+            }
 
             this.rotation.Update();
             this.translation.Update();

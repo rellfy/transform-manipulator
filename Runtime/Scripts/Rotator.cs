@@ -4,24 +4,26 @@ using Object = System.Object;
 
 namespace TransformManipulation {
 
-    public struct Rotator {
-        private Collider clockwise;
-        private Collider counterClockwise;
-        private RotationAxis axis;
+    public class Rotator {
+        private readonly Collider clockwise;
+        private readonly Collider counterClockwise;
+        private readonly RotationAxis axis;
 
         public enum RotationType {
             Clockwise,
             CounterClockwise
         }
 
-        public EventHandler<RotationType> Rotated;
+        public EventHandler<RotationType> RotationRequestStarted;
+        public EventHandler<RotationType> RotationRequestEnded;
 
         public Rotator(Collider clockwise, Collider counterClockwise, RotationAxis axis, Color widgetColor) {
             this.clockwise = clockwise;
             this.counterClockwise = counterClockwise;
             this.axis = axis;
-            this.Rotated = null;
+
             SetColor(widgetColor);
+            Listen();
         }
 
         private void SetColor(Color color) {
@@ -30,6 +32,33 @@ namespace TransformManipulation {
             propertyBlock.SetColor("_Color", color);
             this.clockwise.GetComponentInChildren<Renderer>().SetPropertyBlock(propertyBlock);
             this.counterClockwise.GetComponentInChildren<Renderer>().SetPropertyBlock(propertyBlock);
+        }
+
+        private void Listen() {
+            ClickDelegate clockwise = this.clockwise.gameObject.AddComponent<ClickDelegate>();
+            ClickDelegate counterClockwise = this.counterClockwise.gameObject.AddComponent<ClickDelegate>();
+
+            clockwise.MouseDown += OnClockwiseWidgetClickDown;
+            counterClockwise.MouseDown += OnCounterClockwiseWidgetDown;
+
+            clockwise.MouseUp += OnClockwiseWidgetClickUp;
+            counterClockwise.MouseUp += OnCounterClockwiseWidgetUp;
+        }
+
+        private void OnClockwiseWidgetClickDown(object sender, EventArgs args) {
+            this.RotationRequestStarted?.Invoke(this.axis, RotationType.Clockwise);
+        }
+
+        private void OnCounterClockwiseWidgetDown(object sender, EventArgs args) {
+            this.RotationRequestStarted?.Invoke(this.axis, RotationType.CounterClockwise);
+        }
+
+        private void OnClockwiseWidgetClickUp(object sender, EventArgs args) {
+            this.RotationRequestEnded?.Invoke(this.axis, RotationType.Clockwise);
+        }
+
+        private void OnCounterClockwiseWidgetUp(object sender, EventArgs args) {
+            this.RotationRequestEnded?.Invoke(this.axis, RotationType.CounterClockwise);
         }
 
         public void Update(float radiusFromOrigin) {
