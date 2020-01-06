@@ -11,6 +11,13 @@ namespace TransformManipulation {
         private float widgetScale = 1f;
         private Vector3 translationInput;
         private Vector3 lastMousePosition;
+        /// <summary>
+        /// Used for applying the correct velocity (direction) to the object.
+        /// </summary>
+        private Vector3 mouseVelocity;
+        /// <summary>
+        /// Used for applying the correct speed to the object.
+        /// </summary>
         private Vector3 worldMouseVelocity;
         [SerializeField]
         private TranslationAxes axesPrefab;
@@ -65,12 +72,13 @@ namespace TransformManipulation {
         }
 
         private void UpdateMouseVelocity() {
-            this.worldMouseVelocity = Camera.main.ScreenToWorldPoint(MousePosition) -  Camera.main.ScreenToWorldPoint(this.lastMousePosition);
+            this.worldMouseVelocity = this.camera.ScreenToWorldPoint(MousePosition) -  this.camera.ScreenToWorldPoint(this.lastMousePosition);
+            this.mouseVelocity = this.camera.transform.TransformDirection(MousePosition - this.lastMousePosition);
             this.lastMousePosition = MousePosition;
         }
 
         private void Translate() {
-            Vector3 scaledLocalDirection = Vector3.Scale(this.translationInput, this.transform.InverseTransformDirection(-this.worldMouseVelocity));
+            Vector3 scaledLocalDirection = Vector3.Scale(this.translationInput, this.transform.InverseTransformDirection(this.mouseVelocity));
             this.transform.position += (this.transform.rotation * scaledLocalDirection).normalized * this.worldMouseVelocity.magnitude;
         }
         
