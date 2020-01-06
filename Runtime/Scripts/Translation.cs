@@ -8,10 +8,9 @@ namespace TransformManipulation {
     public class Translation : ITransformManipulator {
 
         [SerializeField, Range(0.5f, 5f)]
-        private float scale = 1f;
+        private float widgetScale = 1f;
         private Vector3 translationInput;
         private Vector3 lastMousePosition;
-        [SerializeField]
         private Vector3 worldMouseVelocity;
         [SerializeField]
         private TranslationAxes axesPrefab;
@@ -62,7 +61,7 @@ namespace TransformManipulation {
         private void UpdateIconTransform() {
             this.axes.transform.position = this.transform.position;
             this.axes.transform.rotation = this.transform.rotation;
-            this.axes.transform.localScale = Vector3.one * this.scale;
+            this.axes.transform.localScale = Vector3.one * this.widgetScale;
         }
 
         private void UpdateMouseVelocity() {
