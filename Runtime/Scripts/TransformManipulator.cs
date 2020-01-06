@@ -61,7 +61,7 @@ namespace TransformManipulation {
         /// <summary>
         /// Removes target and widgets.
         /// </summary>
-        private void ClearTarget() {
+        public void ClearTarget() {
             this.target = null;
             this.translation.ClearTransform();
             this.rotation.ClearTransform();
