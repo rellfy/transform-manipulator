@@ -77,5 +77,11 @@ namespace TransformManipulation {
         private void ClearTranslation() {
             this.translationInput = Vector3.zero;
         }
+
+        public void ClearTransform() {
+            this.transform = null;
+            if (this.axes != null)
+                Object.DestroyImmediate(this.axes.gameObject);
+        }
     }
 }

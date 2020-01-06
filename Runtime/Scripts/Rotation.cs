@@ -81,5 +81,12 @@ namespace TransformManipulation {
             Vector3 rotation = Vector3.Cross(axis.Forward, axis.Up) * (rotationType == Rotator.RotationType.Clockwise ? 1f : -1f);
             this.rotationInput = Vector3.zero;
         }
+
+        public void ClearTransform() {
+            this.transform = null;
+            this.up?.Clear();
+            this.right?.Clear();
+            this.forward?.Clear();
+        }
     }
 }

@@ -76,5 +76,12 @@ namespace TransformManipulation {
             this.clockwise.transform.rotation = Quaternion.LookRotation(-this.axis.Forward, this.axis.Up);
             this.counterClockwise.transform.rotation = Quaternion.LookRotation(this.axis.Forward, this.axis.Up);
         }
+
+        public void Clear() {
+            if (this.clockwise != null)
+                UnityEngine.Object.DestroyImmediate(this.clockwise.gameObject);
+            if (this.counterClockwise != null)
+                UnityEngine.Object.DestroyImmediate(this.counterClockwise.gameObject);
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace TransformManipulation {
         Transform Transform { get; }
         void Start(Transform target);
         void Update();
+        void ClearTransform();
     }
 }

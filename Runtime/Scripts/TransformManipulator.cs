@@ -33,8 +33,10 @@ namespace TransformManipulation {
         }
 
         private void Update() {
-            if (this.target == null)
+            if (this.target == null) {
+                ClearTarget();
                 return;
+            }
 
             if (this.rotation.Transform == null)
                 this.rotation.Start(this.target);
@@ -54,6 +56,15 @@ namespace TransformManipulation {
         /// <param name="target"></param>
         public void SetTarget(Transform target) {
             this.target = target;
+        }
+
+        /// <summary>
+        /// Removes target and widgets.
+        /// </summary>
+        private void ClearTarget() {
+            this.target = null;
+            this.translation.ClearTransform();
+            this.rotation.ClearTransform();
         }
     }
 
