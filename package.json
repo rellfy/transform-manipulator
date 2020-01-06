@@ -1,0 +1,11 @@
+{
+  "name": "com.rellfy.transform-manipulator",
+  "displayName": "Transform Manipulator",
+  "version": "1.0.0",
+  "unity": "2019.1",
+  "description": "Runtime transform manipulation",
+  "keywords": [
+    "tools"
+  ],
+  "type": "library"
+}
